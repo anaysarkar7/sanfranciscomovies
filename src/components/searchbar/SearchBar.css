@@ -1,0 +1,16 @@
+.movieCard {
+  color: black;
+  padding: 0px 0px;
+  font-family: monospace;
+  z-index: 2;
+  float: left;
+  position: relative;
+  top: 0;
+  left: 0;
+  margin: 12px;
+  border-radius: 4px;
+}
+
+#suggestion-li :hover {
+  cursor:grab;
+}
