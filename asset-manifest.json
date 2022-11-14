@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/sanfranciscomovies/static/css/main.dd115357.css",
+    "main.js": "/sanfranciscomovies/static/js/main.7ed4737f.js",
+    "static/js/787.cda612ba.chunk.js": "/sanfranciscomovies/static/js/787.cda612ba.chunk.js",
+    "index.html": "/sanfranciscomovies/index.html",
+    "main.dd115357.css.map": "/sanfranciscomovies/static/css/main.dd115357.css.map",
+    "main.7ed4737f.js.map": "/sanfranciscomovies/static/js/main.7ed4737f.js.map",
+    "787.cda612ba.chunk.js.map": "/sanfranciscomovies/static/js/787.cda612ba.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.dd115357.css",
+    "static/js/main.7ed4737f.js"
+  ]
+}
