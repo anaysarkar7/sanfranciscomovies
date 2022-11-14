@@ -7,7 +7,7 @@ import "./SearchBar.css";
 function SearchBar(props) {
   const [input, setInput] = useState("");
   const [filter, setFilter] = useState("movie");
-  const [suggestions, setSuggestions] = useState([]);
+  const [suggestions, setSuggestions] = useState();
   const [movieDetails, setMovieDetails] = useState();
   const backendurl = `${process.env.REACT_APP_BACKEND_URL}/api/autocompleteSearch`;
 
@@ -34,16 +34,19 @@ function SearchBar(props) {
       console.log(data.error);
     }
   };
+
   const handleFilterClick = (e) => {
     setFilter(e.target.id);
     setMovieDetails();
   };
+
   const handleInputChange = (e) => {
     if (e.target.value == "") {
       setSuggestions([]);
     } else setInput(e.target.value);
     setMovieDetails();
   };
+
   const handleSuggestionClick = (e) => {
     //send coordinates to map component
     const suggestion = JSON.parse(e.target.dataset.item);
