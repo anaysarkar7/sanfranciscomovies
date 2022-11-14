@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
-import mapboxgl from "mapbox-gl";
+import mapboxgl from "!mapbox-gl";
 import "./Map.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import SearchBar from "../searchbar/SearchBar";
