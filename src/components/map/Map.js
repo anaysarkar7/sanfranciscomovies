@@ -4,35 +4,43 @@ import mapboxgl from "!mapbox-gl";
 import "./Map.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import SearchBar from "../searchbar/SearchBar";
+import {
+  DEFAULT_ZOOM_LEVEL,
+  MAPBOX_DEFAULT_STYLE,
+  SANFRANCISCO_LATITUDE,
+  SANFRANCISCO_LONGITUDE,
+} from "../../constants/map.constant";
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
 const Map = () => {
+  const [zoomLevel, setZoomLevel] = useState(DEFAULT_ZOOM_LEVEL);
+  const [longitude, setLongitude] = useState(SANFRANCISCO_LONGITUDE);
+  const [latitude, setLatitude] = useState(SANFRANCISCO_LATITUDE);
+
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [lng, setLng] = useState(-122.431297); //default longitude
-  const [lat, setLat] = useState(37.773972); //default latitude is set to San Francisco
-  const [zoom, setZoom] = useState(12);
-
-  // MAP INITALIZATION USE EFFECT -------------------
+  /**
+   * MAP INITALIZATION USE EFFECT
+   * */
   useEffect(() => {
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v11",
-      center: [lng, lat],
-      zoom: zoom,
+      style: MAPBOX_DEFAULT_STYLE,
+      center: [longitude, latitude],
+      zoom: zoomLevel,
     });
   });
+
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
     map.current.on("move", () => {
-      setLng(map.current.getCenter().lng.toFixed(4));
-      setLat(map.current.getCenter().lat.toFixed(4));
-      setZoom(map.current.getZoom().toFixed(2));
+      setLongitude(map.current.getCenter().lng.toFixed(4));
+      setLatitude(map.current.getCenter().lat.toFixed(4));
+      setZoomLevel(map.current.getZoom().toFixed(2));
     });
   });
-  // MAP INITALIZATION USE EFFECT -------------------
 
   const flyTo = (coordinates) => {
     map.current.flyTo({
@@ -44,8 +52,10 @@ const Map = () => {
     });
   };
 
-  const getSuggestionCoordinates = (coordinates) => {
-    if (coordinates.latitude && coordinates.longitude) flyTo(coordinates);
+  const getSuggestionsWithCoordinates = (suggestion) => {
+    if (suggestion.latitude && suggestion.longitude) {
+      flyTo(suggestion);
+    }
   };
 
   return (
@@ -53,8 +63,8 @@ const Map = () => {
       <div>
         <div ref={mapContainer} className="map-container">
           <div className="sidebar">
-            Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-            <SearchBar onSuggestionClick={getSuggestionCoordinates} />
+            Longitude: {longitude} | Latitude: {latitude} | Zoom: {zoomLevel}
+            <SearchBar onSearchInputChange={getSuggestionsWithCoordinates} />
           </div>
         </div>
       </div>

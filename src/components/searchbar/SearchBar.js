@@ -3,47 +3,52 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import MovieCard from "../map/card/MovieCard";
 import "./SearchBar.css";
+import { AUTOCOMPLETE_SEARCH_ENDPOINT } from "../../constants/enpoint.constant";
+import { DEFAULT_SEARCH_FILTER } from "../../constants/filter.constant";
+
+const BACKEND_AUTOCOMPLETE_SEARCH_URI =
+  `${process.env.REACT_APP_BACKEND_URL}` + AUTOCOMPLETE_SEARCH_ENDPOINT;
 
 function SearchBar(props) {
-  const [input, setInput] = useState("");
-  const [filter, setFilter] = useState("movie");
-  const [suggestions, setSuggestions] = useState();
+  const [inputText, setInputText] = useState("");
+  const [movieFilter, setMovieFilter] = useState(DEFAULT_SEARCH_FILTER);
+  const [suggestionsList, setSuggestionsList] = useState();
   const [movieDetails, setMovieDetails] = useState();
-  const backendurl = `${process.env.REACT_APP_BACKEND_URL}/api/autocompleteSearch`;
 
   useEffect(() => {
-    getSuggestions();
-  }, [input]);
+    autocompleteSearch();
+  }, [inputText]);
 
-  const getSuggestions = async () => {
-    const body = JSON.stringify({
-      inputText: input,
-      filter: filter,
-    });
-    const response = await fetch(backendurl, {
+  const autocompleteSearch = async () => {
+    const requestBody = {
+      inputText: inputText,
+      filter: movieFilter,
+    };
+    const requestHeaders = {
+      "Content-Type": "application/json",
+    };
+    const response = await fetch(BACKEND_AUTOCOMPLETE_SEARCH_URI, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: body,
+      headers: requestHeaders,
+      body: JSON.stringify(requestBody),
     });
-    const data = await response.json();
-    if (data) {
-      setSuggestions(data.result);
+    const autoCompleteSearchResponse = await response.json();
+    if (autoCompleteSearchResponse) {
+      setSuggestionsList(autoCompleteSearchResponse.data);
     } else {
-      console.log(data.error);
+      console.error(autoCompleteSearchResponse.error);
     }
   };
 
   const handleFilterClick = (e) => {
-    setFilter(e.target.id);
+    setMovieFilter(e.target.id);
     setMovieDetails();
   };
 
   const handleInputChange = (e) => {
     if (e.target.value == "") {
-      setSuggestions([]);
-    } else setInput(e.target.value);
+      setSuggestionsList([]);
+    } else setInputText(e.target.value);
     setMovieDetails();
   };
 
@@ -55,7 +60,7 @@ function SearchBar(props) {
       coordinates.latitude = suggestion.latitude;
       coordinates.longitude = suggestion.longitude;
     }
-    setSuggestions([]);
+    setSuggestionsList([]);
     setMovieDetails({ ...movieDetails, ...suggestion });
     props.onSuggestionClick(coordinates);
   };
@@ -73,18 +78,18 @@ function SearchBar(props) {
             onKeyUp={handleInputChange}
           />
           <ul className="list-group" id="suggestion-ul">
-            {suggestions &&
-              suggestions.map((item, i) => {
+            {suggestionsList &&
+              suggestionsList.map((suggestion, index) => {
                 return (
                   <li
                     className="list-group-item"
                     id="suggestion-li"
-                    key={i}
-                    data-item={JSON.stringify(item)}
+                    key={index}
+                    data-item={JSON.stringify(suggestion)}
                     onClick={handleSuggestionClick}
                   >
-                    Movie: {item.title} | Director: {item.director} | Locations:{" "}
-                    {item.locations}
+                    Movie: {suggestion.title} | Director: {suggestion.director}{" "}
+                    | Locations: {suggestion.locations}
                   </li>
                 );
               })}
@@ -106,7 +111,7 @@ function SearchBar(props) {
           </Dropdown.Item>
         </DropdownButton>
         <div className="container mt-1">
-          Results will be filtered by {filter}
+          Results will be filtered by {movieFilter}
         </div>
       </div>
       {movieDetails && (
