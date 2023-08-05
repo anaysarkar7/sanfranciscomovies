@@ -5,24 +5,33 @@ import MovieCard from "../map/card/MovieCard";
 import "./SearchBar.css";
 import { AUTOCOMPLETE_SEARCH_ENDPOINT } from "../../constants/enpoint.constant";
 import { DEFAULT_SEARCH_FILTER } from "../../constants/filter.constant";
+import { DEBOUNCE_DELAY } from "../../constants/debounce.constant";
 
 const BACKEND_AUTOCOMPLETE_SEARCH_URI =
   `${process.env.REACT_APP_BACKEND_URL}` + AUTOCOMPLETE_SEARCH_ENDPOINT;
 
 function SearchBar(props) {
   const [inputText, setInputText] = useState("");
+  const [debouncedInputText, setDebouncedInputText] = useState("");
   const [movieFilter, setMovieFilter] = useState(DEFAULT_SEARCH_FILTER);
   const [suggestionsList, setSuggestionsList] = useState();
   const [movieDetails, setMovieDetails] = useState();
 
   useEffect(() => {
-    autocompleteSearch();
+    const timeoutId = setTimeout(() => {
+      setDebouncedInputText(inputText);
+    }, DEBOUNCE_DELAY);
+    return () => clearTimeout(timeoutId);
   }, [inputText]);
 
-  const autocompleteSearch = async () => {
+  useEffect(() => {
+    autocompleteSearch(debouncedInputText, movieFilter);
+  }, [debouncedInputText]);
+
+  const autocompleteSearch = async (searchText, searchFilter) => {
     const requestBody = {
-      inputText: inputText,
-      filter: movieFilter,
+      inputText: searchText,
+      filterType: searchFilter,
     };
     const requestHeaders = {
       "Content-Type": "application/json",
@@ -42,14 +51,12 @@ function SearchBar(props) {
 
   const handleFilterClick = (e) => {
     setMovieFilter(e.target.id);
-    setMovieDetails();
   };
 
   const handleInputChange = (e) => {
     if (e.target.value == "") {
       setSuggestionsList([]);
     } else setInputText(e.target.value);
-    setMovieDetails();
   };
 
   const handleSuggestionClick = (e) => {
@@ -62,7 +69,7 @@ function SearchBar(props) {
     }
     setSuggestionsList([]);
     setMovieDetails({ ...movieDetails, ...suggestion });
-    props.onSuggestionClick(coordinates);
+    props.onSearchInputChange(coordinates);
   };
 
   return (
@@ -72,7 +79,7 @@ function SearchBar(props) {
           <input
             type="text"
             className="form-control"
-            placeholder="Search for Movie/Location/Director & get suggested movies"
+            placeholder="Search"
             list="movieList"
             id="searchBar"
             onKeyUp={handleInputChange}
@@ -88,8 +95,8 @@ function SearchBar(props) {
                     data-item={JSON.stringify(suggestion)}
                     onClick={handleSuggestionClick}
                   >
-                    Movie: {suggestion.title} | Director: {suggestion.director}{" "}
-                    | Locations: {suggestion.locations}
+                    MOVIE: {suggestion.title} | DIRECTOR: {suggestion.director}{" "}
+                    | LOCATION: {suggestion.locations}
                   </li>
                 );
               })}
@@ -98,21 +105,19 @@ function SearchBar(props) {
         <DropdownButton
           className="mt-2"
           id="dropdown-basic-button"
-          title="filter"
+          title="SEARCH FITLTER"
         >
           <Dropdown.Item onClick={handleFilterClick} id="title">
-            title
+            Movie Title
           </Dropdown.Item>
           <Dropdown.Item onClick={handleFilterClick} id="locations">
-            locations
+            Movie Location
           </Dropdown.Item>
           <Dropdown.Item onClick={handleFilterClick} id="director">
-            director
+            Movie Director
           </Dropdown.Item>
         </DropdownButton>
-        <div className="container mt-1">
-          Results will be filtered by {movieFilter}
-        </div>
+        <div className="container mt-1">Filter : Movie {movieFilter}</div>
       </div>
       {movieDetails && (
         <div className="movieCard">

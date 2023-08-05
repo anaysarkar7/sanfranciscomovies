@@ -1,1 +1,1 @@
-export const AUTOCOMPLETE_SEARCH_ENDPOINT = "/api/autocompleteSearch";
+export const AUTOCOMPLETE_SEARCH_ENDPOINT = "/autocompleteSearch";

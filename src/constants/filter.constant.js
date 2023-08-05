@@ -1,1 +1,1 @@
-export const DEFAULT_SEARCH_FILTER = "movie";
+export const DEFAULT_SEARCH_FILTER = "title";

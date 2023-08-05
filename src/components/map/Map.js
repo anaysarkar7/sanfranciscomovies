@@ -42,19 +42,19 @@ const Map = () => {
     });
   });
 
-  const flyTo = (coordinates) => {
-    map.current.flyTo({
-      duration: 10000,
-      bearing: 90,
-      center: [coordinates.longitude, coordinates.latitude],
-      zoom: 15,
-      pitch: 0,
-    });
-  };
-
-  const getSuggestionsWithCoordinates = (suggestion) => {
-    if (suggestion.latitude && suggestion.longitude) {
-      flyTo(suggestion);
+  const flyToCoordinates = (suggestedMovieDetails) => {
+    if (suggestedMovieDetails.latitude && suggestedMovieDetails.longitude) {
+      map.current.flyTo({
+        duration: 5000,
+        bearing: 90,
+        center: [
+          suggestedMovieDetails.longitude,
+          suggestedMovieDetails.latitude,
+        ],
+        zoom: 15,
+        pitch: 0,
+        essential: true,
+      });
     }
   };
 
@@ -64,7 +64,7 @@ const Map = () => {
         <div ref={mapContainer} className="map-container">
           <div className="sidebar">
             Longitude: {longitude} | Latitude: {latitude} | Zoom: {zoomLevel}
-            <SearchBar onSearchInputChange={getSuggestionsWithCoordinates} />
+            <SearchBar onSearchInputChange={flyToCoordinates} />
           </div>
         </div>
       </div>
